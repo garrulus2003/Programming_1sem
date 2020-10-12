@@ -1,4 +1,4 @@
-﻿/* https://codeforces.com/group/R3IJoiTue4/contest/295360/submission/94524070 */
+/* https://codeforces.com/group/R3IJoiTue4/contest/295360/submission/94524070 */
 
 /*F. Инверсии
 ограничение по времени на тест1 секунда
