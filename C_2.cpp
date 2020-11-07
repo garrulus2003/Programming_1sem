@@ -27,7 +27,7 @@ K-я порядковая статистика.
 
 template <typename T>
 
-T kth(std::vector<T> vec, int n, int k, bool comparator(T, T)) {
+T kth(std::vector<T>& vec, int n, int k, bool comparator(const T&, const T&)) {
 
 	//the algorithm will step by step reduce the area where kth might be
 
@@ -76,7 +76,7 @@ T kth(std::vector<T> vec, int n, int k, bool comparator(T, T)) {
 	}
 }
 
-bool isLess(int a, int b) { //standart less comparator
+bool isLess(const int& a, const int& b) { //standart less comparator
 	return (a < b);
 }
 
