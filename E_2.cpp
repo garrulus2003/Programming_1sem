@@ -23,7 +23,7 @@ K наименьших элементов последовательности �
 #include <iostream>
 #include <vector>
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 class Heap {
 private:
@@ -51,7 +51,7 @@ public:
 	int getSize(); //returns size of the heap
 };
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 void Heap<T, Comparator>::resizeHeap() {
 	T* new_heap = new T[heap_capacity_ * 2]; //creates a new array which is twice bigger
@@ -63,7 +63,7 @@ void Heap<T, Comparator>::resizeHeap() {
 	heap_ = new_heap;
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 Heap<T, Comparator>::Heap() { //constructor
 	size_ = 0;
@@ -71,13 +71,13 @@ Heap<T, Comparator>::Heap() { //constructor
 	heap_ = new T[heap_capacity_];
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 Heap<T, Comparator>::~Heap() { //destructor
 	delete[] heap_;
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 void Heap<T, Comparator>::siftUp(int i) { //changes the kid and parent vertexes until heap condition is done
 	while (i > 1 && (Comparator(heap_[i], heap_[i / 2]))) {
@@ -86,7 +86,7 @@ void Heap<T, Comparator>::siftUp(int i) { //changes the kid and parent vertexes 
 	}
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 void Heap<T, Comparator>::siftDown(int i) { //changes the kid and parent vertexes until heap condition is done
 	while (2 * i <= size_) {
@@ -111,7 +111,7 @@ void Heap<T, Comparator>::siftDown(int i) { //changes the kid and parent vertexe
 	}
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 void Heap<T, Comparator>::insert(T value) { //inserts a T-type value
 	if (size_ >= heap_capacity_ - 1) { //if the heap is full -> resize
@@ -123,13 +123,13 @@ void Heap<T, Comparator>::insert(T value) { //inserts a T-type value
 	siftUp(size_);
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 T Heap<T, Comparator>::getMin() { //returns minimal value
 	return heap_[1];
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 void Heap<T, Comparator>::extractMin() { //extracts minimal value
 	heap_[1] = heap_[size_]; //exchanges minimal value with one of the biggest
@@ -137,13 +137,13 @@ void Heap<T, Comparator>::extractMin() { //extracts minimal value
 	siftDown(1); //returns this big value to it's proper place
 }
 
-template <typename T, bool Comparator(T, T)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 int Heap<T, Comparator>::getSize() { //returns size of the heap
 	return size_;
 }
 
-bool isGreater(long long a, long long b) { //standart 'less' comparator
+bool isGreater(const long long& a, const long long& b) { //standart 'less' comparator
 	return a > b;
 }
 
