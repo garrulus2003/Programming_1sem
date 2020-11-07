@@ -51,6 +51,9 @@ private:
 	void resizeValues();
 	void resizeHeap();
 	void resizePlace();
+	
+	void siftDown(int i);
+	void siftUp(int i);
 
 public:
 	Heap(const Heap& other) = delete;
@@ -63,11 +66,10 @@ public:
 	~Heap(); //destructor
 
 	void insert(long long value, int index); //inserts an element
-	long long getMin(); //returns minimum in heap
+	long long getMin() const; //returns minimum in heap
 	void extractMin(); //extracts minimum
 	void decreaseKey(int pointer, long long delta); //decreases (pointer) element by delta
-	void siftDown(int i);
-	void siftUp(int i);
+	
 };
 
 
