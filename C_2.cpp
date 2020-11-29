@@ -2,20 +2,16 @@
 
 //Neustroeva Liza 024
 
-//https://codeforces.com/group/R3IJoiTue4/contest/296750/submission/95918060
+//https://codeforces.com/group/R3IJoiTue4/contest/296750/submission/99939201
 
 /*
-Даны неотрицательные целые числа N, K и массив целых чисел из диапазона [0,109] размера N. 
-Требуется найти K-ю порядковую статистику, т.е. напечатать число, 
+Даны неотрицательные целые числа N, K и массив целых чисел из диапазона [0,109] размера N.
+Требуется найти K-ю порядковую статистику, т.е. напечатать число,
 которое бы стояло на позиции с индексом K ∈[0,N−1] в отсортированном массиве.
-
 Напишите нерекурсивный алгоритм. Требования к дополнительной памяти: O(1). Требуемое среднее время работы: O(N).
-
 Входные данные
 В первой строке записаны N и K.
-
 В N последующих строках записаны числа последовательности.
-
 Выходные данные
 K-я порядковая статистика.
 */
@@ -24,6 +20,29 @@ K-я порядковая статистика.
 #include <iostream>
 #include <vector>
 #include <algorithm>
+
+template <typename T>
+
+size_t partition(std::vector <T>& vec, size_t begin, size_t end, size_t pivot, bool comparator(const T&, const T&)) {
+	std::swap(vec[end - 1], vec[pivot]);  //putting pivot to the most right position of the area
+
+	size_t i = begin;
+	size_t j = begin;
+
+
+	while (j < end) { //partition procedure in current area with respect to pivot
+		if (comparator(vec[end - 1], vec[j])) {
+			++j;
+		}
+		else {
+			std::swap(vec[i], vec[j]);
+			++i;
+			++j;
+		}
+	}
+
+	return i - 1;
+}
 
 template <typename T>
 
@@ -45,33 +64,16 @@ T kth(std::vector<T>& vec, int n, int k, bool comparator(const T&, const T&)) {
 
 		int pivot = (left + right) / 2; //let the middle of the area be pivot
 
-		std::swap(vec[right - 1], vec[pivot]);  //putting pivot to the most right position of the area
+		int current = partition(vec, left, right, pivot, comparator);
 
-		int i = left; 
-		int j = left;
-
-
-		while (j < right) { //partition procedure in current area with respect to pivot
-			if (comparator(vec[right - 1], vec[j])) {
-				++j;
-			}
-			else {
-				std::swap(vec[i], vec[j]);
-				++i;
-				++j;
-			}
-		}
-
-		//i-1 is current pivot index
-
-		if (i - 1 == k) {
+		if (current == k) {
 			return vec[k];
 		}
-		if (i - 1 < k) {
-			left = i; //changing left border
+		if (current < k) {
+			left = current + 1; //changing left border
 		}
-		if (i - 1 > k) {
-			right = i - 1; //changing right border
+		if (current > k) {
+			right = current; //changing right border
 		}
 	}
 }
