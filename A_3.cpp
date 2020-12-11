@@ -1,8 +1,8 @@
-﻿//Problem A. Contest 3. 
+//Problem A. Contest 3. 
 
 //Neustroeva Liza 024
 
-//https://codeforces.com/group/R3IJoiTue4/contest/301990/submission/99957797
+//https://codeforces.com/group/R3IJoiTue4/contest/301990/submission/100949285
 
 /*
 Реализуйте AVL-дерево. Решения с использованием других структур засчитываться не будут.
@@ -25,7 +25,7 @@ prev x — максимальный элемент в дереве, меньши
 #include <string>
 #include <iostream>
 
-template <typename T, bool Comparator(T&, T&)>
+template <typename T, bool Comparator(const T&, const T&)>
 
 class AVL {
 private:
@@ -34,28 +34,33 @@ private:
 		int depth;
 		Node* left;
 		Node* right;
-		Node(T Value) { value = Value; depth = 0; left = nullptr; right = nullptr; }
+		Node(const T& Value) { value = Value; depth = 0; left = nullptr; right = nullptr; }
 	};
 
 	Node* root;
 
-	int depth(Node* node);
+	//functions updating vertex
+	int depth(Node* node) const;
+	int delta(Node* node) const;
 	void new_depth(Node* node);
-	int delta(Node* node);
+
+	//balancing functions
 	Node* sright(Node* node);
 	Node* sleft(Node* node);
 	Node* balance(Node* node);
-	Node* insert(T x, Node* current);
+
+	Node* insert(const T& x, Node* current);
 	Node* extractMin(Node*);
-	Node* getMin(Node* node);
-	Node* getMax(Node* node);
-	Node* extract(T x, Node* node);
+	Node* extract(const T& x, Node* node);
+	Node* getMin(Node* node) const;
+	Node* getMax(Node* node) const;
 
 
-	void inorder(Node* node);
-	bool exists(T x, Node* current);
-	T next(T x, Node* current);
-	T prev(T x, Node* current);
+	void inorder(Node* node) const;
+	bool exists(const T& x, Node* current) const;
+	void deleting(Node* node);
+	T next(const T& x, Node* current) const;
+	T prev(const T& x, Node* current) const;
 
 public:
 	AVL(const AVL& other) = delete;
@@ -67,60 +72,50 @@ public:
 	AVL();
 	~AVL();
 
-	void inorder();
-	bool exists(T x);
-	void insert(T x);
-	void extract(T x);
-	void next(T x);
-	void prev(T x);
+	void inorder() const;
+	bool exists(const T& x) const;
+	void insert(const T& x);
+	void extract(const T& x);
+	void next(const T& x) const;
+	void prev(const T& x) const;
 };
 
-template <typename T, bool Comparator(T&, T&)>
-
+template <typename T, bool Comparator(const T&, const T&)>
 AVL <T, Comparator>::AVL() {
 	root = nullptr;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
+template <typename T, bool Comparator(const T&, const T&)>
 AVL<T, Comparator>::~AVL() {
-	while (root) {
-		root = extractMin(root);
-	}
+	deleting(root);
 }
 
-template <typename T, bool Comparator(T&, T&)>
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::deleting(Node* node) {
+	if (!node) return;
+	deleting(node->left);
+	deleting(node->right);
+	delete node;
+}
 
-int AVL<T, Comparator>::depth(Node* node) {
+template <typename T, bool Comparator(const T&, const T&)>
+int AVL<T, Comparator>::depth(Node* node) const{
 	return node ? node->depth : 0;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
+template <typename T, bool Comparator(const T&, const T&)>
 void AVL<T, Comparator>::new_depth(Node* node) {
-	if (!node) {
-		std::cout << "0";
-		return;
-	}
-	else {
-		node->depth = (depth(node->left) > depth(node->right) ? depth(node->left) : depth(node->right)) + 1;
-	}
+	if (!node) return;
+	node->depth = std::max(depth(node->left), depth(node->right)) + 1;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-int AVL <T, Comparator>::delta(Node* node) {
-	if (!node) {
-		std::cout << "0";
-		return 0;
-	}
-	else {
-		return depth(node->left) - depth(node->right);
-	}
+template <typename T, bool Comparator(const T&, const T&)>
+int AVL <T, Comparator>::delta(Node* node) const {
+	if (!node) return 0;
+	return depth(node->left) - depth(node->right);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
+template <typename T, bool Comparator(const T&, const T&)>
 typename AVL<T, Comparator>::Node* AVL<T, Comparator>::sright(Node* node) {
 	Node* new_node = node->left;
 	node->left = new_node->right;
@@ -130,9 +125,7 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::sright(Node* node) {
 	return new_node;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-
+template <typename T, bool Comparator(const T&, const T&)>
 typename AVL<T, Comparator>::Node* AVL<T, Comparator>::sleft(Node* node) {
 	Node* new_node = node->right;
 	node->right = new_node->left;
@@ -142,8 +135,7 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::sleft(Node* node) {
 	return new_node;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
+template <typename T, bool Comparator(const T&, const T&)>
 typename AVL<T, Comparator>::Node* AVL<T, Comparator>::balance(Node* node)
 {
 	new_depth(node);
@@ -162,9 +154,8 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::balance(Node* node)
 	return node;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-typename AVL<T, Comparator>::Node* AVL<T, Comparator>::insert(T x, Node* current) {
+template <typename T, bool Comparator(const T&, const T&)>
+typename AVL<T, Comparator>::Node* AVL<T, Comparator>::insert(const T& x, Node* current) {
 	if (!current) {
 		return new Node(x);
 	}
@@ -177,73 +168,55 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::insert(T x, Node* current
 	return balance(current);
 }
 
-template <typename T, bool Comparator(T&, T&)>
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::inorder(Node* node) const {
+	if (!node) return;
 
-void AVL<T, Comparator>::inorder(Node* node) {
-	if (!node) {
-		return;
-	}
 	inorder(node->left);
+
 	if (node->right) {
 		std::cout << "Right son of " << node->value << " is " << node->right->value << std::endl;
 	}
 	if (node->left) {
 		std::cout << "Left son of " << node->value << " is " << node->left->value << std::endl;
 	}
+
 	inorder(node->right);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-void AVL<T, Comparator>::inorder() {
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::inorder() const {
 	inorder(root);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-bool AVL<T, Comparator>::exists(T x, Node* current) {
-	if (!current) {
-		return false;
-	}
-	if (Comparator(x, current->value)) {
-		return exists(x, current->left);
-	}
-	else if (!Comparator(x,current->value) && !Comparator(current->value, x)) {
-		return true;
-	}
-	else {
-		return exists(x, current->right);
-	}
+template <typename T, bool Comparator(const T&, const T&)>
+bool AVL<T, Comparator>::exists(const T& x, Node* current) const {
+	if (!current) return false;
+	if (Comparator(x, current->value)) return exists(x, current->left);
+	if (!Comparator(x, current->value) && !Comparator(current->value, x)) return true;
+	return exists(x, current->right);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-bool AVL<T, Comparator>::exists(T x) {
+template <typename T, bool Comparator(const T&, const T&)>
+bool AVL<T, Comparator>::exists(const T& x) const {
 	return exists(x, root);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-void AVL<T, Comparator>::insert(T x) {
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::insert(const T& x) {
 	if (!exists(x)) {
 		root = insert(x, root);
 	}
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-typename AVL<T, Comparator>::Node* AVL<T, Comparator>::getMin(Node* node)
-{
+template <typename T, bool Comparator(const T&, const T&)>
+typename AVL<T, Comparator>::Node* AVL<T, Comparator>::getMin(Node* node) const {
 	return node->left ? getMin(node->left) : node;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extract(int T, Node* node)
-{
-	if (!node) {
-		return nullptr;
-	}
+template <typename T, bool Comparator(const T&, const T&)>
+typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extract(const T& x, Node* node) {
+	if (!node) return nullptr;
 	if (Comparator(x, node->value)) {
 		node->left = extract(x, node->left);
 	}
@@ -266,40 +239,31 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extract(int T, Node* node
 	return balance(node);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-void AVL<T, Comparator>::extract(T x) {
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::extract(const T& x) {
 	if (exists(x)) {
 		root = extract(x, root);
 	}
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-typename AVL<T, Comparator>::Node* AVL<T, Comparator>::getMax(Node* node)
-{
+template <typename T, bool Comparator(const T&, const T&)>
+typename AVL<T, Comparator>::Node* AVL<T, Comparator>::getMax(Node* node) const {
 	return node->right ? getMax(node->right) : node;
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-T AVL<T, Comparator>::next(T x, Node* current) {
+template <typename T, bool Comparator(const T&, const T&)>
+T AVL<T, Comparator>::next(const T& x, Node* current) const {
 	if (Comparator(x, current->value)) {
 		if (current->left && Comparator(x, getMax(current->left)->value)) {
 			return next(x, current->left);
 		}
-		else {
-			return current->value;
-		}
+		return current->value;
 	}
-	if (!Comparator(x, current->value)) {
-		return next(x, current->right);
-	}
+	return next(x, current->right);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-void AVL<T, Comparator>::next(T x) {
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::next(const T& x) const {
 	if (!root || !Comparator(x, getMax(root)->value)) {
 		std::cout << "none \n";
 	}
@@ -308,26 +272,20 @@ void AVL<T, Comparator>::next(T x) {
 	}
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-T AVL<T, Comparator>::prev(T x, Node* current) {
-	if (Comparator (current->value, x)) {
+template <typename T, bool Comparator(const T&, const T&)>
+T AVL<T, Comparator>::prev(const T& x, Node* current) const {
+	if (Comparator(current->value, x)) {
 		if (current->right && Comparator(getMin(current->right)->value, x)) {
 			return prev(x, current->right);
 		}
-		else {
-			return current->value;
-		}
+		return current->value;
 	}
-	if (!Comparator(current->value, x)) {
-		return prev(x, current->left);
-	}
+	return prev(x, current->left);
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-void AVL<T, Comparator>::prev(T x) {
-	if (!root || !Comparator(getMin(root)->value, x) {
+template <typename T, bool Comparator(const T&, const T&)>
+void AVL<T, Comparator>::prev(const T& x) const {
+	if (!root || !Comparator(getMin(root)->value, x)) {
 		std::cout << "none \n";
 	}
 	else {
@@ -335,10 +293,8 @@ void AVL<T, Comparator>::prev(T x) {
 	}
 }
 
-template <typename T, bool Comparator(T&, T&)>
-
-typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extractMin(AVL::Node* node)
-{
+template <typename T, bool Comparator(const T&, const T&)>
+typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extractMin(AVL::Node* node) {
 	if (!node->left) {
 		return node->right;
 	}
@@ -346,7 +302,7 @@ typename AVL<T, Comparator>::Node* AVL<T, Comparator>::extractMin(AVL::Node* nod
 	return balance(node);
 }
 
-bool isLess(long long& a, long long& b) {
+bool isLess(const long long& a, const long long& b) {
 	return a < b;
 }
 
