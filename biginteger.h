@@ -623,7 +623,7 @@ std::string Rational::asDecimal(size_t precision) const {
 	frac_part.is_negative_ = false;
 	answer += int_part.toString();
 
-	if (precision != 0 && frac_part == 0) {
+	if (precision != 0 && frac_part == 0) {             //if it was not integer division although it was divided
 		answer += ".";
 		for (size_t i = 0; i < precision; ++i) {
 			answer += "0";
