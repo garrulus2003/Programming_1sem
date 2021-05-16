@@ -1,6 +1,6 @@
 //Contest 8 : Problem I
 //Neustroeva Liza 024
-//https://codeforces.com/group/R3IJoiTue4/contest/319476/submission/112273155
+//https://codeforces.com/group/R3IJoiTue4/contest/319476/submission/116435085
 
 /*
 * Дан неориентированный граф без петель и кратных рёбер. 
@@ -28,26 +28,17 @@
 class Graph {
 	int vertices;
 	std::vector<std::vector<int>> edges;
-	std::vector<bool> marked;
-	std::vector<int> tin, ret;
-	std::set<int> articulation_points;
 
 public:
-	Graph(std::vector<std::vector<int>> graph) : vertices(graph.size()), edges(graph) {
-		marked.resize(vertices, false);
-		tin.resize(vertices);
-		ret.resize(vertices);
-	}
+	Graph(std::vector<std::vector<int>> graph) : vertices(graph.size()), edges(graph) {}
 
 	Graph(int n) : vertices(n) {
 		edges.resize(vertices);
-		marked.resize(vertices, false);
-		tin.resize(vertices);
-		ret.resize(vertices);
 	}
 
 	void read(int edges_quantity);
-	void dfs_articulation_points(int vertex, int parent, int& t);
+	void dfs_articulation_points(int vertex, int parent, int& t, std::vector<bool>& marked, std::vector<int>& tin, 
+		std::vector<int>& ret, std::set<int>& articulation_points);
 	std::set<int> find_articulation_points();
 };
 
@@ -60,7 +51,8 @@ void Graph::read(int edges_quantity) {
 	}
 }
 
-void Graph::dfs_articulation_points(int vertex, int parent, int& t) {
+void Graph::dfs_articulation_points(int vertex, int parent, int& t, std::vector<bool>& marked, std::vector<int>& tin,
+	std::vector<int>& ret, std::set<int>& articulation_points) {
 	tin[vertex] = t++;
 	ret[vertex] = tin[vertex];
 	marked[vertex] = true;
@@ -71,7 +63,7 @@ void Graph::dfs_articulation_points(int vertex, int parent, int& t) {
 			ret[vertex] = std::min(ret[vertex], tin[edges[vertex][i]]);
 		}
 		else {
-			dfs_articulation_points(edges[vertex][i], vertex, t);
+			dfs_articulation_points(edges[vertex][i], vertex, t, marked, tin, ret, articulation_points);
 			++cnt;
 			if (parent != -1) {
 				if (ret[edges[vertex][i]] >= tin[vertex]) {
@@ -85,10 +77,14 @@ void Graph::dfs_articulation_points(int vertex, int parent, int& t) {
 }
 
 std::set<int> Graph::find_articulation_points() {
+	std::vector<bool> marked(vertices, false);
+	std::vector<int> tin(vertices);
+	std::vector<int>ret(vertices);
+	std::set<int> articulation_points;
 	int t = 0;
 	for (int i = 0; i < vertices; ++i) {
 		if (!marked[i]) {
-			dfs_articulation_points(i, -1, t);
+			dfs_articulation_points(i, -1, t, marked, tin, ret, articulation_points);
 		}
 	}
 	return articulation_points;
