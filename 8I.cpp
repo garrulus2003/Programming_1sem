@@ -1,4 +1,4 @@
-﻿//Contest 8 : Problem I
+//Contest 8 : Problem I
 //Neustroeva Liza 024
 //https://codeforces.com/group/R3IJoiTue4/contest/319476/submission/112273155
 
@@ -30,7 +30,7 @@ class Graph {
 	std::vector<std::vector<int>> edges;
 	std::vector<bool> marked;
 	std::vector<int> tin, ret;
-	std::set<int> joint_points;
+	std::set<int> articulation_points;
 
 public:
 	Graph(std::vector<std::vector<int>> graph) : vertices(graph.size()), edges(graph) {
@@ -47,8 +47,8 @@ public:
 	}
 
 	void read(int edges_quantity);
-	void dfs(int vertex, int parent, int& t);
-	std::set<int> get_jp();
+	void dfs_articulation_points(int vertex, int parent, int& t);
+	std::set<int> find_articulation_points();
 };
 
 void Graph::read(int edges_quantity) {
@@ -60,7 +60,7 @@ void Graph::read(int edges_quantity) {
 	}
 }
 
-void Graph::dfs(int vertex, int parent, int& t) {
+void Graph::dfs_articulation_points(int vertex, int parent, int& t) {
 	tin[vertex] = t++;
 	ret[vertex] = tin[vertex];
 	marked[vertex] = true;
@@ -71,27 +71,27 @@ void Graph::dfs(int vertex, int parent, int& t) {
 			ret[vertex] = std::min(ret[vertex], tin[edges[vertex][i]]);
 		}
 		else {
-			dfs(edges[vertex][i], vertex, t);
+			dfs_articulation_points(edges[vertex][i], vertex, t);
 			++cnt;
 			if (parent != -1) {
 				if (ret[edges[vertex][i]] >= tin[vertex]) {
-					joint_points.insert(vertex);
+					articulation_points.insert(vertex);
 				}
 			}
 			ret[vertex] = std::min(ret[vertex], ret[edges[vertex][i]]);
 		}
 	}
-	if (parent == -1 && cnt > 1) joint_points.insert(vertex);
+	if (parent == -1 && cnt > 1) articulation_points.insert(vertex);
 }
 
-std::set<int> Graph::get_jp() {
+std::set<int> Graph::find_articulation_points() {
 	int t = 0;
 	for (int i = 0; i < vertices; ++i) {
 		if (!marked[i]) {
-			dfs(i, -1, t);
+			dfs_articulation_points(i, -1, t);
 		}
 	}
-	return joint_points;
+	return articulation_points;
 }
 
 int main() {
@@ -100,7 +100,7 @@ int main() {
 	Graph g(n);
 	g.read(m);
 
-	std::set<int> ans = g.get_jp();
+	std::set<int> ans = g.find_articulation_points();
 
 	std::cout << ans.size() << '\n';
 	for (auto vertex : ans) std::cout << vertex + 1 << " ";
